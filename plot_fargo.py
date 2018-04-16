@@ -149,21 +149,21 @@ class Plot_FARGO:
         else:
             domain = self.domain[np.where(n_array != 1)]
             if direct == ['x','y']:
-                #data = data[3:-3,:]
                 domain[1] = domain[1][3:-3]
             elif direct == ['y','z']:
-                #data = data[3:-3,3:-3]
                 domain[0] = domain[0][3:-3]
                 domain[1] = domain[1][3:-3]
                 polar_temp = False # nescessary for cylindrical setup
             elif direct == ['x','z']:
-                #data = data[3:-3,:]
                 domain[1] = domain[1][3:-3]
 
         if data.ndim == 3 and direct is None: print("3 Dim - spezialisiere deine Dimension!")
 
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=polar_temp)
+        fig.subplots_adjust(top = 0.83)
+        if polar_temp:
+            fig.subplots_adjust(left=-0.2)
 
         if log10:
             cax = ax.pcolormesh(domain[0], domain[1], np.log10(data))
@@ -187,7 +187,6 @@ class Plot_FARGO:
 
         if filename != "":
             plt.savefig(filename, dpi = 300)
-            plt.close()
         else:
             return fig, ax
 
@@ -205,6 +204,7 @@ class Plot_FARGO:
 
     def plot_2D_video(self, filename, direct = None, tp = "gasdens", log10 = True, polar = True,
                       framesteps = 1, N = None):
+        import matplotlib.pyplot as plt
         if N is None:
             N = int(int(self.parameters["Ntot"])/int(self.parameters.get("Ninterm", 1)))
 
@@ -212,6 +212,7 @@ class Plot_FARGO:
             self.plot_2D(i, direct = direct, tp=tp, log10 = log10, polar = polar,
                          filename = "single_frames/"+filename+"{:05d}".format(i)+".jpeg")
             if i > 10 and i % round(N / 10) == 0: print(round(i / N * 100), "%")
+            plt.close()
 
         for i in range(0, N+1, framesteps):
             plot_and_save(i)
